@@ -8,20 +8,29 @@ class Index extends StatefulWidget {
 }
 
 class _IndexState extends State<Index> {
+  bool isappBar = true;
   List<Widget> pages = [
     ImageCapture(),
     Profile(),
   ];
   var currentindex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
-        centerTitle: true,
-        title: Text('Scan'),
-        automaticallyImplyLeading: false,
-      ),
+      appBar: isappBar
+          ? AppBar(
+              backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
+              centerTitle: true,
+              title: Text('Scan'),
+              automaticallyImplyLeading: false,
+            )
+          : null,
       // bottomNavigationBar: BottomNavigationBar(
       //   backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
       //   selectedItemColor: Colors.white,
@@ -41,11 +50,16 @@ class _IndexState extends State<Index> {
       //   onTap: (index) {
       //     setState(() {
       //       currentindex = index;
+      //       if (index == 1) {
+      //         isappBar = false;
+      //       } else {
+      //         isappBar = true;
+      //       }
       //     });
       //   },
       // ),
-      // body: pages[currentindex],
       body: ImageCapture(),
+      // body: ImageCapture(),
     );
   }
 }

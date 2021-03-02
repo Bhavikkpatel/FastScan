@@ -27,9 +27,9 @@ class _AdjustImageState extends State<AdjustImage> {
     RenderBox imageBox = key.currentContext.findRenderObject();
     width = imageBox.size.width;
     height = imageBox.size.height;
-    print('$height           $width');
+    // print('$height           $width');
     imagePixelSize = ImageSizGetter.getSize(widget.file);
-    print('${imagePixelSize.height}     ${imagePixelSize.width}');
+    // print('${imagePixelSize.height}     ${imagePixelSize.width}');
     tl = new Offset(20, 20);
     tr = new Offset(width - 20, 20);
     bl = new Offset(20, height - 20);
@@ -111,7 +111,7 @@ class _AdjustImageState extends State<AdjustImage> {
                                 y1 >= 0 &&
                                 x1 < width / 2 &&
                                 y1 < height / 2) {
-                              print(details.localPosition);
+                              // print(details.localPosition);
                               setState(() {
                                 tl = details.localPosition;
                               });
@@ -165,7 +165,7 @@ class _AdjustImageState extends State<AdjustImage> {
                                 y1 >= 0 &&
                                 x1 < width / 2 &&
                                 y1 < height / 2) {
-                              print(details.localPosition);
+                              // print(details.localPosition);
                               setState(() {
                                 tl = details.localPosition;
                               });

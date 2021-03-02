@@ -4,7 +4,6 @@ import 'package:scanner/pages/Index.dart';
 import 'package:scanner/widgets/contants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io' as io;
-import 'package:beauty_textfield/beauty_textfield.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 class CusDialog extends StatefulWidget {
@@ -18,13 +17,34 @@ class CusDialog extends StatefulWidget {
 class _CusDialogState extends State<CusDialog> {
   Future start() async {
     var dir = await getExternalStorageDirectory();
-    var scanDir =
-        await new io.Directory('${dir.path}/Scan').create(recursive: true);
+    await new io.Directory('${dir.path}/Scan').create(recursive: true);
+  }
+
+  bool isSameName = false;
+  bool noName = false;
+  List file = new List();
+  String directory;
+  void get() async {
+    try {
+      directory = (await getApplicationDocumentsDirectory()).path;
+      setState(() {
+        file = io.Directory("$directory/scan/").listSync();
+      });
+    } catch (e) {
+      print(e);
+    }
+    print('file: $file');
   }
 
   Duration duration = const Duration(milliseconds: 500);
   TextEditingController fileName = TextEditingController();
   bool isShadow = true;
+  @override
+  initState() {
+    get();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -41,13 +61,14 @@ class _CusDialogState extends State<CusDialog> {
     return Stack(
       children: <Widget>[
         Container(
-          height: MediaQuery.of(context).size.height * 0.4,
+          height: MediaQuery.of(context).size.height * 0.43,
           padding: EdgeInsets.only(
-              left: Constants.padding,
-              top: Constants.avatarRadius + Constants.padding,
-              right: Constants.padding,
-              bottom: Constants.padding),
-          margin: EdgeInsets.only(top: Constants.avatarRadius),
+            left: Constants.padding,
+            top: Constants.avatarRadius + Constants.padding,
+            right: Constants.padding,
+          ),
+          // bottom: Constants.padding
+          margin: EdgeInsets.only(top: Constants.avatarRadius - 30),
           decoration: BoxDecoration(
               shape: BoxShape.rectangle,
               color: Colors.white,
@@ -70,7 +91,7 @@ class _CusDialogState extends State<CusDialog> {
                 style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
               ),
               SizedBox(
-                height: 15,
+                height: 10,
               ),
               AnimatedContainer(
                 width: double.maxFinite,
@@ -125,6 +146,24 @@ class _CusDialogState extends State<CusDialog> {
                 ),
                 duration: duration,
               ),
+              SizedBox(
+                height: 5,
+              ),
+              (isSameName == true)
+                  ? Align(
+                      alignment: Alignment.center,
+                      child:
+                          Text('file with name ${fileName.text} already exist'),
+                    )
+                  : noName == true
+                      ? Align(
+                          alignment: Alignment.center,
+                          child: Text('file with name cannot be empty'),
+                        )
+                      : Container(),
+              SizedBox(
+                height: 5,
+              ),
               Align(
                 alignment: Alignment.bottomCenter,
                 child: FlatButton(
@@ -135,25 +174,43 @@ class _CusDialogState extends State<CusDialog> {
                           color: const Color(0xff5c5bb0),
                         )),
                     onPressed: () async {
-                      if (fileName.text != '') {
-                        await start();
-                        io.Directory documentDirectory =
-                            await getApplicationDocumentsDirectory();
-                        String documentPath = documentDirectory.path;
-                        var scanDir = await io.Directory('$documentPath/scan')
-                            .create(recursive: true);
-                        var list =
-                            io.Directory("$documentPath/scan/").listSync();
-                        io.File file = new io.File(
-                            "$documentPath/scan/${fileName.text}.pdf");
-                        print('${file.path}');
-                        file.writeAsBytes(widget.pdf.save());
-                        SharedPreferences pref =
-                            await SharedPreferences.getInstance();
-                        pref.setBool('check', false);
-                        print(pref.getBool('check'));
-                        Navigator.pushReplacement(context,
-                            MaterialPageRoute(builder: (context) => Index()));
+                      List<dynamic> fNameList = [];
+                      for (dynamic a in file) {
+                        fNameList.add(a
+                            .toString()
+                            .split('/')
+                            .last
+                            .replaceAll("'", "")
+                            .split('.')
+                            .first);
+                      }
+                      if (!fNameList.contains(fileName.text)) {
+                        if (fileName.text != '') {
+                          await start();
+                          io.Directory documentDirectory =
+                              await getApplicationDocumentsDirectory();
+                          String documentPath = documentDirectory.path;
+                          io.File file = new io.File(
+                              "$documentPath/scan/${fileName.text}.pdf");
+                          print('${file.path}');
+                          file.writeAsBytes(widget.pdf.save());
+                          SharedPreferences pref =
+                              await SharedPreferences.getInstance();
+                          pref.setBool('check', false);
+                          print(pref.getBool('check'));
+                          Navigator.pushReplacement(context,
+                              MaterialPageRoute(builder: (context) => Index()));
+                        } else {
+                          setState(() {
+                            isSameName = false;
+                            noName = true;
+                          });
+                        }
+                      } else {
+                        setState(() {
+                          noName = false;
+                          isSameName = true;
+                        });
                       }
                     },
                     child: Text(

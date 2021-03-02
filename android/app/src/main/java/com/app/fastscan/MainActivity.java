@@ -3,7 +3,7 @@ package com.app.fastscan;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-
+import android.os.Environment;
 import androidx.annotation.NonNull;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
@@ -23,11 +23,25 @@ import io.flutter.embedding.android.FlutterActivity;
 import io.flutter.embedding.engine.FlutterEngine;
 import io.flutter.plugin.common.MethodChannel;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.ArrayList;
+
 public class MainActivity extends FlutterActivity {
     byte[] byteArray;
     byte[] grayArray;
     byte[] originalArray;
     byte[] whiteBoardArray;
+    byte[] mp3;
     @Override
     public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
         super.configureFlutterEngine(flutterEngine);
@@ -74,7 +88,6 @@ public class MainActivity extends FlutterActivity {
                     bitmap.compress(Bitmap.CompressFormat.JPEG,100,stream);
                     byte[] byteArray=stream.toByteArray();
                     result.success(byteArray);
-
                 }
             }
             if(call.method.equals("original")){
@@ -143,10 +156,48 @@ public class MainActivity extends FlutterActivity {
             if(call.method.equals("whiteboardCompleted")){
                 result.success(whiteBoardArray);
             }
+            if(call.method.equals("ytmp3")) {
+                Thread thread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try  {
+                            System.out.println("in");
+                            Document document;
+                            document = Jsoup.connect("https://www.yt-download.org/api/button/mp3/pRpeEdMmmQ0").get();
+                            Elements elementsByClass = document.getElementsByTag("a");
+                            ArrayList<String> urls = new ArrayList<>();
+                            for(Element a: elementsByClass) {
+                                urls.add(a.attr("href"));
+                            }
+                            for(String a: urls) {
+                                System.out.println(a);
+                            }
+                            int index = 1;
+                            Jsoup.connect(urls.get(0));
+                            URLConnection conn = new URL(urls.get(0)).openConnection();
+                            InputStream is = conn.getInputStream();
+                            System.out.println(is.toString());
+                            String name = "mp3"+index;
+                            byte[] buffer = new byte[4096];
+                            int len;
+                            int l = is.available();
+                            is.read(buffer, 0, l);
+                            System.out.println(buffer);
+                            mp3 = buffer;
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                thread.start();
+                result.success("");
+            }
+            if(call.method.equals("mp3complete")){
+                result.success(mp3);
+            }
         });
     }
     class RotateThread extends  Thread{
-
         RotateThread(byte[] bytes){
             byteArray=bytes;
         }
@@ -285,3 +336,4 @@ public class MainActivity extends FlutterActivity {
         }
     }
 }
+

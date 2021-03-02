@@ -33,6 +33,7 @@ class ShowImage extends StatefulWidget {
 }
 
 PdfDocument pdf = new PdfDocument();
+List<dynamic> allimg = [];
 
 class _ShowImageState extends State<ShowImage> {
   final _focusNode = FocusNode();
@@ -62,11 +63,14 @@ class _ShowImageState extends State<ShowImage> {
   void check() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     if (pref.getBool('check') == false) {
-      print('pref.getBool() = ${pref.getBool('check')}');
+      // print('pref.getBool() = ${pref.getBool('check')}');
       pdf = new PdfDocument();
+      allimg = [];
     }
   }
 
+  bool added = false;
+  bool Sadded = false;
   @override
   void initState() {
     super.initState();
@@ -100,10 +104,10 @@ class _ShowImageState extends State<ShowImage> {
       setState(() {
         _image = io.File(imageFile.path);
       });
-      Navigator.of(context).push(MaterialPageRoute(
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
           builder: (context) => AdjustImage(_image, context)));
     } catch (e) {
-      print('Error occurred -> $e');
+      // print('Error occurred -> $e');
     }
   }
 
@@ -116,12 +120,12 @@ class _ShowImageState extends State<ShowImage> {
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: filter_index,
           onTap: (index) {
-            print(index);
+            // print(index);
             setState(() {
               filter_index = index;
               bytes = images[filter_index];
             });
-            print(bytes);
+            // print(bytes);
           },
           selectedItemColor: Colors.white,
           backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
@@ -151,35 +155,43 @@ class _ShowImageState extends State<ShowImage> {
                   size: 30,
                 ),
                 onPressed: () async {
-                  setState(() {
-                    loading = true;
-                    print('adding');
-                  });
-                  PdfPage page = pdf.pages.add();
-                  page.graphics.drawImage(
-                      PdfBitmap(bytes),
-                      Rect.fromLTWH(0, 0, page.getClientSize().width,
-                          page.getClientSize().height));
-                  SharedPreferences pref =
-                      await SharedPreferences.getInstance();
-                  pref.setBool('check', true); // ongoing
-                  setState(() {
-                    loading = false;
-                    print('added');
-                    Navigator.pop(context);
-                    _getImage(ImageSource.camera);
-                  });
+                  if (!Sadded) {
+                    setState(() {
+                      loading = true;
+                      // print('adding');
+                    });
+                    allimg.add(bytes);
+                    PdfPage page = pdf.pages.add();
+                    page.graphics.drawImage(
+                        PdfBitmap(bytes),
+                        Rect.fromLTWH(0, 0, page.getClientSize().width,
+                            page.getClientSize().height));
+                    SharedPreferences pref =
+                        await SharedPreferences.getInstance();
+                    pref.setBool('check', true); // ongoing
+                    setState(() {
+                      loading = false;
+                      // print('added');
+                      Sadded = true;
+                    });
+                  }
+                  _getImage(ImageSource.camera);
                 }),
             IconButton(
                 icon: FaIcon(FontAwesomeIcons.save),
                 onPressed: () async {
-                  print('adding');
-                  PdfPage page = pdf.pages.add();
-                  page.graphics.drawImage(
-                      PdfBitmap(bytes),
-                      Rect.fromLTWH(0, 0, page.getClientSize().width,
-                          page.getClientSize().height));
-                  print('saving');
+                  if (!Sadded) {
+                    // print('adding');
+                    PdfPage page = pdf.pages.add();
+                    page.graphics.drawImage(
+                        PdfBitmap(bytes),
+                        Rect.fromLTWH(0, 0, page.getClientSize().width,
+                            page.getClientSize().height));
+                    allimg.add(bytes);
+                    setState(() {
+                      Sadded = true;
+                    });
+                  }
                   // io.Directory documentDirectory =
                   //     await getApplicationDocumentsDirectory();
                   io.Directory dc = await getTemporaryDirectory();
@@ -187,12 +199,17 @@ class _ShowImageState extends State<ShowImage> {
                   io.File file = io.File("$documentPath/record1.pdf");
                   file.writeAsBytes(pdf.save());
                   String fullPath = "$documentPath/record1.pdf";
-                  print(fullPath);
+                  // print(fullPath);
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => PDFView(fullPath, pdf)));
-                  print('displayed');
+                          builder: (context) => PDFView(
+                              fullPath,
+                              pdf,
+                              allimg,
+                              MediaQuery.of(context).size.height * 0.7,
+                              MediaQuery.of(context).size.width * 0.7)));
+                  // print('displayed');
                 }),
           ],
         ),
@@ -214,7 +231,6 @@ class _ShowImageState extends State<ShowImage> {
                     angle = 0;
                   }
                   angle = angle + 90;
-                  print(angle);
                   var nbytes = await channel
                       .invokeMethod('rotateCompleted', {"bytes": bytes});
                   setState(() {
@@ -322,7 +338,7 @@ class _ShowImageState extends State<ShowImage> {
       });
     });
     Timer(Duration(seconds: 7), () async {
-      print("this started");
+      // print("this started");
       await channel.invokeMethod('grayCompleted').then((value) {
         grayBytes = value;
         isGrayBytes = true;
@@ -341,7 +357,7 @@ class _ShowImageState extends State<ShowImage> {
       setState(() {
         loading = false;
       });
-      print('loading:  $loading');
+      // print('loading:  $loading');
     });
   }
 
@@ -350,7 +366,7 @@ class _ShowImageState extends State<ShowImage> {
       setState(() {
         loading = true;
       });
-      print('loading:  $loading');
+      // print('loading:  $loading');
       grayandoriginal();
     }
   }
