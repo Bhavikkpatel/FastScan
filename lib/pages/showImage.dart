@@ -6,6 +6,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:scanner/pages/image_adjust.dart';
+import 'package:scanner/widgets/ImgSourceDialog.dart';
 import 'package:scanner/widgets/loading.dart';
 import 'package:scanner/widgets/pdfpreview.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -175,7 +176,12 @@ class _ShowImageState extends State<ShowImage> {
                       Sadded = true;
                     });
                   }
-                  _getImage(ImageSource.camera);
+                  // _getImage(ImageSource.camera);
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return ImgsrcDialog();
+                      });
                 }),
             IconButton(
                 icon: FaIcon(FontAwesomeIcons.save),

@@ -18,6 +18,8 @@ class _CusDialogState extends State<CusDialog> {
   Future start() async {
     var dir = await getExternalStorageDirectory();
     await new io.Directory('${dir.path}/Scan').create(recursive: true);
+    print('created');
+    get();
   }
 
   bool isSameName = false;
@@ -41,7 +43,8 @@ class _CusDialogState extends State<CusDialog> {
   bool isShadow = true;
   @override
   initState() {
-    get();
+    start();
+    // get();
     super.initState();
   }
 
@@ -61,14 +64,15 @@ class _CusDialogState extends State<CusDialog> {
     return Stack(
       children: <Widget>[
         Container(
-          height: MediaQuery.of(context).size.height * 0.43,
+          height: MediaQuery.of(context).size.height * 0.35,
           padding: EdgeInsets.only(
-            left: Constants.padding,
-            top: Constants.avatarRadius + Constants.padding,
-            right: Constants.padding,
+            left: MediaQuery.of(context).size.width * 0.05,
+            top: MediaQuery.of(context).size.height * 0.05,
+            right: MediaQuery.of(context).size.width * 0.05,
           ),
           // bottom: Constants.padding
-          margin: EdgeInsets.only(top: Constants.avatarRadius - 30),
+          margin:
+              EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.06),
           decoration: BoxDecoration(
               shape: BoxShape.rectangle,
               color: Colors.white,
@@ -79,19 +83,19 @@ class _CusDialogState extends State<CusDialog> {
               ]),
           child: Column(
             children: <Widget>[
-              Text(
-                'Save Pdf',
-                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+              Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Text(
+                  'Save Pdf',
+                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+                ),
               ),
-              SizedBox(
-                height: 15,
-              ),
-              Text(
-                'Enter file name',
-                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
-              ),
-              SizedBox(
-                height: 10,
+              Padding(
+                padding: EdgeInsets.all(5.0),
+                child: Text(
+                  'Enter file name',
+                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+                ),
               ),
               AnimatedContainer(
                 width: double.maxFinite,
@@ -146,19 +150,21 @@ class _CusDialogState extends State<CusDialog> {
                 ),
                 duration: duration,
               ),
-              SizedBox(
-                height: 5,
-              ),
               (isSameName == true)
                   ? Align(
                       alignment: Alignment.center,
-                      child:
-                          Text('file with name ${fileName.text} already exist'),
+                      child: Text(
+                        'file with name ${fileName.text} already exist',
+                        style: TextStyle(color: Colors.red, fontSize: 16),
+                      ),
                     )
                   : noName == true
                       ? Align(
                           alignment: Alignment.center,
-                          child: Text('file with name cannot be empty'),
+                          child: Text(
+                            'file with name cannot be empty',
+                            style: TextStyle(color: Colors.red, fontSize: 16),
+                          ),
                         )
                       : Container(),
               SizedBox(
@@ -175,21 +181,25 @@ class _CusDialogState extends State<CusDialog> {
                         )),
                     onPressed: () async {
                       List<dynamic> fNameList = [];
-                      for (dynamic a in file) {
-                        fNameList.add(a
-                            .toString()
-                            .split('/')
-                            .last
-                            .replaceAll("'", "")
-                            .split('.')
-                            .first);
-                      }
-                      if (!fNameList.contains(fileName.text)) {
-                        if (fileName.text != '') {
-                          await start();
-                          io.Directory documentDirectory =
-                              await getApplicationDocumentsDirectory();
-                          String documentPath = documentDirectory.path;
+                      if (fileName.text != '') {
+                        await start();
+                        io.Directory documentDirectory =
+                            await getApplicationDocumentsDirectory();
+                        String documentPath = documentDirectory.path;
+                        var scanDir = await io.Directory('$documentPath/scan')
+                            .create(recursive: true);
+                        var list =
+                            io.Directory("$documentPath/scan/").listSync();
+                        for (dynamic a in list) {
+                          fNameList.add(a
+                              .toString()
+                              .split('/')
+                              .last
+                              .replaceAll("'", "")
+                              .split('.')
+                              .first);
+                        }
+                        if (!fNameList.contains(fileName.text)) {
                           io.File file = new io.File(
                               "$documentPath/scan/${fileName.text}.pdf");
                           print('${file.path}');
@@ -202,14 +212,14 @@ class _CusDialogState extends State<CusDialog> {
                               MaterialPageRoute(builder: (context) => Index()));
                         } else {
                           setState(() {
-                            isSameName = false;
-                            noName = true;
+                            noName = false;
+                            isSameName = true;
                           });
                         }
                       } else {
                         setState(() {
-                          noName = false;
-                          isSameName = true;
+                          isSameName = false;
+                          noName = true;
                         });
                       }
                     },

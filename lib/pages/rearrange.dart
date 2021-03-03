@@ -106,13 +106,16 @@ class _RearrangeState extends State<Rearrange> {
                 })
           ],
         ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              wrap,
-            ],
+        body: Container(
+          color: Color.fromRGBO(58, 66, 86, 1.0),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                wrap,
+              ],
+            ),
           ),
         ),
       ),

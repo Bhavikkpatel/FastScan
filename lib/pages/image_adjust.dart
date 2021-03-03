@@ -1,13 +1,14 @@
 import 'dart:async';
-import 'dart:io';
+import 'dart:io' as io;
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:image_size_getter/image_size_getter.dart';
 import 'package:scanner/pages/showImage.dart';
 import 'package:scanner/widgets/cropper.dart';
+import 'package:image_picker/image_picker.dart';
 
 class AdjustImage extends StatefulWidget {
-  final File file;
+  final io.File file;
   final BuildContext context;
   AdjustImage(this.file, this.context);
   @override
@@ -48,6 +49,23 @@ class _AdjustImageState extends State<AdjustImage> {
     Timer(Duration(seconds: 2), getImageSize);
   }
 
+  var _imagePicker = ImagePicker();
+  io.File _image;
+  String path;
+  _getImage(ImageSource imageSource) async {
+    try {
+      PickedFile imageFile = await _imagePicker.getImage(source: imageSource);
+      if (imageFile == null) return;
+      setState(() {
+        _image = io.File(imageFile.path);
+      });
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
+          builder: (context) => AdjustImage(_image, context)));
+    } catch (e) {
+      // print('Error occurred -> $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     screenHeight = MediaQuery.of(context).size.height;
@@ -55,6 +73,12 @@ class _AdjustImageState extends State<AdjustImage> {
     return SafeArea(
       child: Scaffold(
           appBar: AppBar(
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back),
+              onPressed: () {
+                _getImage(ImageSource.camera);
+              },
+            ),
             backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
             centerTitle: true,
             title: Text('Adjust'),
