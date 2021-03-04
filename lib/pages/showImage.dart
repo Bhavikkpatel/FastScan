@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:line_icons/line_icons.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:scanner/pages/image_adjust.dart';
 import 'package:scanner/widgets/ImgSourceDialog.dart';
@@ -132,27 +133,46 @@ class _ShowImageState extends State<ShowImage> {
           backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
           items: [
             BottomNavigationBarItem(
-              icon: FaIcon(FontAwesomeIcons.fileImage),
+              icon: Icon(
+                LineIcons.filter,
+                size: 30,
+              ),
               label: 'original',
             ),
             BottomNavigationBarItem(
-              icon: FaIcon(FontAwesomeIcons.fileImage),
+              icon: Icon(
+                LineIcons.filter,
+                size: 30,
+              ),
               label: 'White Board',
             ),
             BottomNavigationBarItem(
-              icon: FaIcon(FontAwesomeIcons.fileImage),
+              icon: Icon(
+                LineIcons.filter,
+                size: 30,
+              ),
               label: 'grey',
             )
           ],
         ),
         appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(
+              LineIcons.arrowLeft,
+              size: 30,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
           backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
           centerTitle: true,
-          title: Text('Preview'),
+          title: Text('Filters'),
           actions: [
             IconButton(
                 icon: Icon(
-                  Icons.add,
+                  LineIcons.plus,
                   size: 30,
                 ),
                 onPressed: () async {
@@ -184,7 +204,10 @@ class _ShowImageState extends State<ShowImage> {
                       });
                 }),
             IconButton(
-                icon: FaIcon(FontAwesomeIcons.save),
+                icon: Icon(
+                  LineIcons.arrowRight,
+                  size: 30,
+                ),
                 onPressed: () async {
                   if (!Sadded) {
                     // print('adding');
@@ -198,8 +221,6 @@ class _ShowImageState extends State<ShowImage> {
                       Sadded = true;
                     });
                   }
-                  // io.Directory documentDirectory =
-                  //     await getApplicationDocumentsDirectory();
                   io.Directory dc = await getTemporaryDirectory();
                   String documentPath = dc.path;
                   io.File file = io.File("$documentPath/record1.pdf");
@@ -223,7 +244,10 @@ class _ShowImageState extends State<ShowImage> {
         floatingActionButton: FloatingActionButton(
           backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
           elevation: 15,
-          child: Icon(Icons.rotate_right_outlined),
+          child: Icon(
+            Icons.rotate_right,
+            size: 30,
+          ),
           onPressed: () {
             setState(() {
               isRotating = true;

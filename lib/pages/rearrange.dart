@@ -3,6 +3,7 @@ import 'dart:ffi';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:line_icons/line_icons.dart';
 import 'package:reorderables/reorderables.dart';
 import 'package:scanner/pages/showImage.dart';
 import 'package:scanner/widgets/dialog.dart';
@@ -78,7 +79,10 @@ class _RearrangeState extends State<Rearrange> {
           centerTitle: true,
           actions: [
             IconButton(
-                icon: Icon(Icons.save),
+                icon: Icon(
+                  LineIcons.save,
+                  size: 30,
+                ),
                 onPressed: () {
                   PdfDocument pdf = PdfDocument();
                   for (int i = 0; i < widget.image.length; i++) {
@@ -96,7 +100,10 @@ class _RearrangeState extends State<Rearrange> {
                       });
                 }),
             IconButton(
-                icon: FaIcon(FontAwesomeIcons.solidWindowClose),
+                icon: Icon(
+                  LineIcons.windowClose,
+                  size: 30,
+                ),
                 onPressed: () {
                   showDialog(
                       context: context,

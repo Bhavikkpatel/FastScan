@@ -22,44 +22,46 @@ class _IndexState extends State<Index> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: isappBar
-          ? AppBar(
-              backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
-              centerTitle: true,
-              title: Text('Scan'),
-              automaticallyImplyLeading: false,
-            )
-          : null,
-      // bottomNavigationBar: BottomNavigationBar(
-      //   backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
-      //   selectedItemColor: Colors.white,
-      //   items: [
-      //     BottomNavigationBarItem(
-      //       icon: Icon(
-      //         Icons.scanner,
-      //       ),
-      //       label: 'Scanner',
-      //     ),
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.person),
-      //       label: 'Profile',
-      //     ),
-      //   ],
-      //   currentIndex: currentindex,
-      //   onTap: (index) {
-      //     setState(() {
-      //       currentindex = index;
-      //       if (index == 1) {
-      //         isappBar = false;
-      //       } else {
-      //         isappBar = true;
-      //       }
-      //     });
-      //   },
-      // ),
-      body: ImageCapture(),
-      // body: ImageCapture(),
+    return SafeArea(
+      child: Scaffold(
+        appBar: isappBar
+            ? AppBar(
+                backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
+                centerTitle: true,
+                title: Text('Scan'),
+                automaticallyImplyLeading: false,
+              )
+            : null,
+        // bottomNavigationBar: BottomNavigationBar(
+        //   backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
+        //   selectedItemColor: Colors.white,
+        //   items: [
+        //     BottomNavigationBarItem(
+        //       icon: Icon(
+        //         Icons.scanner,
+        //       ),
+        //       label: 'Scanner',
+        //     ),
+        //     BottomNavigationBarItem(
+        //       icon: Icon(Icons.person),
+        //       label: 'Profile',
+        //     ),
+        //   ],
+        //   currentIndex: currentindex,
+        //   onTap: (index) {
+        //     setState(() {
+        //       currentindex = index;
+        //       if (index == 1) {
+        //         isappBar = false;
+        //       } else {
+        //         isappBar = true;
+        //       }
+        //     });
+        //   },
+        // ),
+        body: ImageCapture(),
+        // body: ImageCapture(),
+      ),
     );
   }
 }

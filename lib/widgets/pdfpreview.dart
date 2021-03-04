@@ -1,6 +1,7 @@
 import 'dart:io' as io;
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:line_icons/line_icons.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -87,7 +88,10 @@ class _PDFViewState extends State<PDFView> {
           centerTitle: true,
           actions: [
             IconButton(
-                icon: FaIcon(FontAwesomeIcons.plusCircle),
+                icon: Icon(
+                  LineIcons.plus,
+                  size: 30,
+                ),
                 onPressed: () async {
                   SharedPreferences pref =
                       await SharedPreferences.getInstance();
@@ -100,7 +104,10 @@ class _PDFViewState extends State<PDFView> {
                       });
                 }),
             IconButton(
-                icon: FaIcon(FontAwesomeIcons.save),
+                icon: Icon(
+                  LineIcons.save,
+                  size: 30,
+                ),
                 onPressed: () async {
                   Navigator.push(
                       context,

@@ -3,6 +3,7 @@ import 'dart:io' as io;
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:image_size_getter/image_size_getter.dart';
+import 'package:line_icons/line_icons.dart';
 import 'package:scanner/pages/showImage.dart';
 import 'package:scanner/widgets/cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -74,7 +75,10 @@ class _AdjustImageState extends State<AdjustImage> {
       child: Scaffold(
           appBar: AppBar(
             leading: IconButton(
-              icon: Icon(Icons.arrow_back),
+              icon: Icon(
+                LineIcons.arrowLeft,
+                size: 30,
+              ),
               onPressed: () {
                 _getImage(ImageSource.camera);
               },
@@ -84,7 +88,10 @@ class _AdjustImageState extends State<AdjustImage> {
             title: Text('Adjust'),
             actions: [
               IconButton(
-                icon: Icon(Icons.add_circle_outline),
+                icon: Icon(
+                  LineIcons.arrowRight,
+                  size: 30,
+                ),
                 onPressed: () {
                   Timer(Duration(seconds: 1), () {
                     Navigator.of(context).pushReplacement(MaterialPageRoute(

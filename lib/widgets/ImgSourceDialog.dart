@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:line_icons/line_icons.dart';
 import 'package:scanner/pages/image_adjust.dart';
 import 'package:scanner/widgets/contants.dart';
 import 'dart:io' as io;
@@ -72,7 +73,8 @@ class _ImgsrcDialogState extends State<ImgsrcDialog> {
                 padding: EdgeInsets.only(
                     top: MediaQuery.of(context).size.height * 0.03),
                 child: OutlineButton(
-                  color: Color.fromRGBO(58, 66, 86, 1.0),
+                  highlightedBorderColor: Color.fromRGBO(58, 66, 86, 1.0),
+                  highlightElevation: 10,
                   borderSide: BorderSide(width: 2),
                   onPressed: () {
                     _getImage(ImageSource.camera);
@@ -81,7 +83,8 @@ class _ImgsrcDialogState extends State<ImgsrcDialog> {
                 ),
               ),
               OutlineButton(
-                color: Color.fromRGBO(58, 66, 86, 1.0),
+                highlightedBorderColor: Color.fromRGBO(58, 66, 86, 1.0),
+                highlightElevation: 10,
                 borderSide: BorderSide(width: 2),
                 onPressed: () {
                   _getImage(ImageSource.gallery);
@@ -103,11 +106,11 @@ class _ImgsrcDialogState extends State<ImgsrcDialog> {
               child: Container(
                 color: Colors.white,
                 child: Padding(
-                  padding: EdgeInsets.all(8.0),
+                  padding: EdgeInsets.all(10.0),
                   child: Icon(
-                    Icons.image,
+                    LineIcons.image,
                     color: Color.fromRGBO(58, 66, 86, 1.0),
-                    size: MediaQuery.of(context).size.height * 0.07,
+                    size: MediaQuery.of(context).size.height * 0.05,
                   ),
                 ),
               ),
