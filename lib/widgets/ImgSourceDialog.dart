@@ -78,6 +78,7 @@ class _ImgsrcDialogState extends State<ImgsrcDialog> {
                   borderSide: BorderSide(width: 2),
                   onPressed: () {
                     _getImage(ImageSource.camera);
+                    Navigator.pop(context);
                   },
                   child: Text('Camera'),
                 ),
@@ -88,6 +89,7 @@ class _ImgsrcDialogState extends State<ImgsrcDialog> {
                 borderSide: BorderSide(width: 2),
                 onPressed: () {
                   _getImage(ImageSource.gallery);
+                  Navigator.pop(context);
                 },
                 child: Text('Gallery'),
               ),

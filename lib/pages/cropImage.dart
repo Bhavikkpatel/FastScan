@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
+import 'package:image_size_getter/file_input.dart';
+
 import '../widgets/cropper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -32,7 +34,7 @@ class _CropImageState extends State<CropImage> {
     RenderBox imageBox = key.currentContext.findRenderObject();
     width = imageBox.size.width;
     height = imageBox.size.height;
-    imagePixelSize = ImageSizGetter.getSize(widget.file);
+    imagePixelSize = ImageSizeGetter.getSize(FileInput(widget.file));
     tl = new Offset(20, 20);
     tr = new Offset(width - 20, 20);
     bl = new Offset(20, height - 20);

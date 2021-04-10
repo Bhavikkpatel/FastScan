@@ -64,7 +64,7 @@ class _CusDialogState extends State<CusDialog> {
     return Stack(
       children: <Widget>[
         Container(
-          height: MediaQuery.of(context).size.height * 0.35,
+          height: MediaQuery.of(context).size.height * 0.37,
           padding: EdgeInsets.only(
             left: MediaQuery.of(context).size.width * 0.05,
             top: MediaQuery.of(context).size.height * 0.05,

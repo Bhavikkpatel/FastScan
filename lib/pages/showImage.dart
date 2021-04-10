@@ -2,13 +2,12 @@ import 'dart:async';
 import 'dart:io' as io;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:scanner/pages/image_adjust.dart';
 import 'package:scanner/widgets/ImgSourceDialog.dart';
-import 'package:scanner/widgets/loading.dart';
 import 'package:scanner/widgets/pdfpreview.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
@@ -38,7 +37,7 @@ PdfDocument pdf = new PdfDocument();
 List<dynamic> allimg = [];
 
 class _ShowImageState extends State<ShowImage> {
-  final _focusNode = FocusNode();
+  var _currentIndex = 0;
   MethodChannel channel = new MethodChannel('opencv');
   GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   int index = 0;
@@ -108,9 +107,7 @@ class _ShowImageState extends State<ShowImage> {
       });
       Navigator.of(context).pushReplacement(MaterialPageRoute(
           builder: (context) => AdjustImage(_image, context)));
-    } catch (e) {
-      // print('Error occurred -> $e');
-    }
+    } catch (e) {}
   }
 
   int filter_index = 1;
@@ -119,93 +116,63 @@ class _ShowImageState extends State<ShowImage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: filter_index,
-          onTap: (index) {
-            // print(index);
-            setState(() {
-              filter_index = index;
-              bytes = images[filter_index];
-            });
-            // print(bytes);
-          },
-          selectedItemColor: Colors.white,
-          backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
-          items: [
-            BottomNavigationBarItem(
-              icon: Icon(
-                LineIcons.filter,
-                size: 30,
-              ),
-              label: 'original',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(
-                LineIcons.filter,
-                size: 30,
-              ),
-              label: 'White Board',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(
-                LineIcons.filter,
-                size: 30,
-              ),
-              label: 'grey',
-            )
-          ],
-        ),
+        bottomNavigationBar: bottomNavBar(),
         appBar: AppBar(
           leading: IconButton(
             icon: Icon(
               LineIcons.arrowLeft,
               size: 30,
-              color: Colors.white,
+              color: Colors.black,
             ),
             onPressed: () {
               Navigator.pop(context);
             },
           ),
-          backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
-          centerTitle: true,
-          title: Text('Filters'),
+          backgroundColor: Colors.white,
+          centerTitle: false,
+          title: Text(
+            'Edit',
+            style: TextStyle(color: Colors.black),
+          ),
           actions: [
-            IconButton(
-                icon: Icon(
-                  LineIcons.plus,
-                  size: 30,
-                ),
-                onPressed: () async {
-                  if (!Sadded) {
-                    setState(() {
-                      loading = true;
-                      // print('adding');
-                    });
-                    allimg.add(bytes);
-                    PdfPage page = pdf.pages.add();
-                    page.graphics.drawImage(
-                        PdfBitmap(bytes),
-                        Rect.fromLTWH(0, 0, page.getClientSize().width,
-                            page.getClientSize().height));
-                    SharedPreferences pref =
-                        await SharedPreferences.getInstance();
-                    pref.setBool('check', true); // ongoing
-                    setState(() {
-                      loading = false;
-                      // print('added');
-                      Sadded = true;
-                    });
-                  }
-                  // _getImage(ImageSource.camera);
-                  showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return ImgsrcDialog();
-                      });
-                }),
+            // IconButton(
+            //     icon: Icon(
+            //       LineIcons.plus,
+            //       color: Colors.black,
+            //       size: 30,
+            //     ),
+            //     onPressed: () async {
+            //       if (!Sadded) {
+            //         setState(() {
+            //           loading = true;
+            //           // print('adding');
+            //         });
+            //         allimg.add(bytes);
+            //         PdfPage page = pdf.pages.add();
+            //         page.graphics.drawImage(
+            //             PdfBitmap(bytes),
+            //             Rect.fromLTWH(0, 0, page.getClientSize().width,
+            //                 page.getClientSize().height));
+            //         SharedPreferences pref =
+            //             await SharedPreferences.getInstance();
+            //         pref.setBool('check', true); // ongoing
+            //         setState(() {
+            //           loading = false;
+            //           // print('added');
+            //           Sadded = true;
+            //         });
+            //       }
+            //       // _getImage(ImageSource.camera);
+            //       showDialog(
+            //           context: context,
+            //           builder: (BuildContext context) {
+            //             return ImgsrcDialog();
+            //           });
+            //     }),
             IconButton(
                 icon: Icon(
                   LineIcons.arrowRight,
+                  color: Colors.black,
                   size: 30,
                 ),
                 onPressed: () async {
@@ -274,12 +241,14 @@ class _ShowImageState extends State<ShowImage> {
         ),
         backgroundColor: Colors.grey[300],
         body: Container(
-          color: Color.fromRGBO(58, 66, 86, 1.0),
+          // color: Color.fromRGBO(58, 66, 86, 1.0),
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
           child: Center(
             child: loading || isRotating
-                ? loadingCircle()
+                ? SpinKitDoubleBounce(
+                    color: Colors.blue,
+                  )
                 : Container(
                     height: MediaQuery.of(context).size.height,
                     child: bytes != null
@@ -304,7 +273,11 @@ class _ShowImageState extends State<ShowImage> {
                                     ),
                             ],
                           )
-                        : Center(child: loadingCircle()),
+                        : Center(
+                            child: SpinKitPouringHourglass(
+                            color: Colors.blue,
+                            size: 100,
+                          )),
                   ),
           ),
         ),
@@ -399,5 +372,131 @@ class _ShowImageState extends State<ShowImage> {
       // print('loading:  $loading');
       grayandoriginal();
     }
+  }
+
+  BottomNavigationBar bottomNavBar() {
+    return BottomNavigationBar(
+      elevation: 0,
+      selectedFontSize: 14,
+      unselectedFontSize: 14,
+      selectedItemColor: Colors.black,
+      currentIndex: _currentIndex,
+      onTap: (index) async {
+        setState(() {
+          _currentIndex = index;
+        });
+        if (_currentIndex == 0) {
+          colorOptions();
+        } else if (_currentIndex == 2) {
+          if (!Sadded) {
+            setState(() {
+              loading = true;
+            });
+            allimg.add(bytes);
+            PdfPage page = pdf.pages.add();
+            page.graphics.drawImage(
+                PdfBitmap(bytes),
+                Rect.fromLTWH(0, 0, page.getClientSize().width,
+                    page.getClientSize().height));
+            SharedPreferences pref = await SharedPreferences.getInstance();
+            pref.setBool('check', true); // ongoing
+            setState(() {
+              loading = false;
+              Sadded = true;
+            });
+          }
+          // _getImage(ImageSource.camera);
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return ImgsrcDialog();
+              });
+        }
+      },
+      items: [
+        BottomNavigationBarItem(
+            icon: Icon(Icons.color_lens_outlined),
+            label: 'Color',
+            activeIcon: Icon(
+              Icons.format_paint_outlined,
+              size: 30,
+              color: Colors.red,
+            )),
+        BottomNavigationBarItem(
+            icon: Icon(Icons.crop),
+            label: 'Crop',
+            activeIcon: Icon(
+              Icons.crop,
+              size: 30,
+              color: Colors.blue,
+            )),
+        BottomNavigationBarItem(
+          icon: Icon(
+            LineIcons.plus,
+            color: Colors.black,
+            size: 30,
+          ),
+          activeIcon: Icon(
+            LineIcons.plus,
+            size: 30,
+            color: Colors.green,
+          ),
+          label: 'Add page',
+        )
+      ],
+    );
+  }
+
+  void colorOptions() {
+    showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return ConstrainedBox(
+            constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.3),
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: [
+                GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        bytes = images[0];
+                      });
+                      Navigator.pop(context);
+                    },
+                    child: filterContainer(0)),
+                SizedBox(
+                  width: 10,
+                ),
+                GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        bytes = images[1];
+                      });
+                      Navigator.pop(context);
+                    },
+                    child: filterContainer(1)),
+                SizedBox(
+                  width: 10,
+                ),
+                GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        bytes = images[2];
+                      });
+                      Navigator.pop(context);
+                    },
+                    child: filterContainer(2)),
+              ],
+            ),
+          );
+        });
+  }
+
+  Widget filterContainer(index) {
+    return Container(
+      width: 130,
+      child: Image.memory(images[index]),
+    );
   }
 }

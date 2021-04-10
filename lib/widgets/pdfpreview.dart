@@ -74,7 +74,10 @@ class _PDFViewState extends State<PDFView> {
     return Scaffold(
         appBar: AppBar(
           leading: IconButton(
-            icon: Icon(Icons.arrow_back),
+            icon: Icon(
+              Icons.arrow_back,
+              size: 30,
+            ),
             onPressed: () {
               if (images.length == 0) {
                 _getImage(ImageSource.camera);
@@ -120,7 +123,8 @@ class _PDFViewState extends State<PDFView> {
           ],
         ),
         body: Container(
-          color: Color.fromRGBO(58, 66, 86, 1.0),
+          // color: Color.fromRGBO(58, 66, 86, 1.0),
+          color: Colors.grey[300],
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
           // child: p.PDFView(

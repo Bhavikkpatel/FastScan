@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:scanner/pages/Home.dart';
+import 'package:scanner/pages/image_adjust.dart';
 import './camera.dart';
 import './profile.dart';
+import 'dart:io' as io;
 
 class Index extends StatefulWidget {
   @override
@@ -20,18 +25,36 @@ class _IndexState extends State<Index> {
     super.initState();
   }
 
+  io.File _image;
+
+  String directory;
+  var _imagePicker = ImagePicker();
+  _getImage(ImageSource imageSource) async {
+    try {
+      PickedFile imageFile = await _imagePicker.getImage(source: imageSource);
+      if (imageFile == null) return;
+      setState(() {
+        _image = io.File(imageFile.path);
+      });
+      Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => AdjustImage(_image, context)));
+    } catch (e) {
+      print('Error occurred -> $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        appBar: isappBar
-            ? AppBar(
-                backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
-                centerTitle: true,
-                title: Text('Scan'),
-                automaticallyImplyLeading: false,
-              )
-            : null,
+        // appBar: isappBar
+        //     ? AppBar(
+        //         backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
+        //         centerTitle: true,
+        //         title: Text('Your Documents'),
+        //         automaticallyImplyLeading: false,
+        //       )
+        //     : null,
         // bottomNavigationBar: BottomNavigationBar(
         //   backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
         //   selectedItemColor: Colors.white,
@@ -59,7 +82,7 @@ class _IndexState extends State<Index> {
         //     });
         //   },
         // ),
-        body: ImageCapture(),
+        body: Home(),
         // body: ImageCapture(),
       ),
     );

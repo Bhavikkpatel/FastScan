@@ -63,199 +63,203 @@ class _ImageCaptureState extends State<ImageCapture> {
     return Container(
       key: _scaffoldKey,
       // color: Color.fromRGBO(58, 66, 86, 1.0),
-      child: Column(
-        // mainAxisAlignment: MainAxisAlignment.end,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          // Padding(
-          //   padding: EdgeInsets.only(top: 8, left: lrPadding),
-          //   child: Text(
-          //     'Your',
-          //     style: TextStyle(
-          //       fontSize: 40,
-          //       fontWeight: FontWeight.bold,
-          //       color: Color.fromRGBO(58, 66, 86, 1.0),
-          //     ),
-          //   ),
-          // ),
-          // Padding(
-          //   padding: EdgeInsets.only(left: lrPadding),
-          //   child: Text(
-          //     'Documents',
-          //     style: TextStyle(
-          //       fontSize: 40,
-          //       fontWeight: FontWeight.bold,
-          //       color: Color.fromRGBO(58, 66, 86, 1.0),
-          //     ),
-          //   ),
-          // ),
-          Expanded(
-            flex: 1,
-            child: file.length != 0
-                ? ListView.builder(
-                    itemCount: file.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      var name = file[index].toString().split("/");
-                      String fName = name[name.length - 1].replaceAll("'", "");
-                      print(fName);
-                      return Card(
-                        color: Color.fromRGBO(58, 66, 86, 1.0),
-                        // color: Colors.blue,
-                        child: ExpansionTile(
-                          childrenPadding:
-                              EdgeInsets.only(left: 30, bottom: 10, right: 30),
-                          title: Text(
-                            fName,
-                            style: TextStyle(color: Colors.white, fontSize: 21),
-                          ),
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: RaisedButton(
-                                    onPressed: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  PDFshow(file[index])));
-                                    },
-                                    child: Text(
-                                      'Open',
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                    color: Color.fromRGBO(38, 46, 66, 1.0),
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(30)),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: RaisedButton(
-                                    onPressed: () async {
-                                      Uint8List pfile =
-                                          await file[index].readAsBytes();
-                                      await Share.file(
-                                          'Pdf Document', fName, pfile, '*/*');
-                                    },
-                                    child: Text(
-                                      'Share',
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                    color: Color.fromRGBO(38, 46, 66, 1.0),
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(30)),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: RaisedButton(
-                                    onPressed: () async {
-                                      print('delete');
-                                      showDialog(
-                                          context: context,
-                                          builder: (BuildContext context) {
-                                            return DeleteDialog(
-                                                file[index], this);
-                                          });
-                                    },
-                                    child: Text(
-                                      'Delete',
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                    color: Color.fromRGBO(38, 46, 66, 1.0),
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(30)),
-                                  ),
-                                ),
-                              ],
-                            )
-                          ],
-                        ),
-                      );
-                    })
-                : Padding(
-                    padding: EdgeInsets.only(
-                        top: MediaQuery.of(context).size.height * 0.35),
-                    child: Text(
-                      'No files',
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Color.fromRGBO(58, 66, 86, 1.0),
-                      ),
-                    ),
-                  ),
-            // child: Padding(
-            //   padding: EdgeInsets.only(
-            //       left: lrPadding,
-            //       right: lrPadding,
-            //       bottom: MediaQuery.of(context).size.height * 0.4,
-            //       top: MediaQuery.of(context).size.height * 0.05),
-            //   child: Container(
-            //     width: MediaQuery.of(context).size.width,
-            //     child: Card(
-            //       shape: RoundedRectangleBorder(
-            //           borderRadius: BorderRadius.circular(30)),
-            //       color: Colors.blue,
-            //       child: Column(
-            //         // mainAxisAlignment: MainAxisAlignment.center,
-            //         children: [
-            //           IconButton(
-            //             onPressed: () {
-            //               showDialog(
-            //                   context: context,
-            //                   builder: (BuildContext context) {
-            //                     return ImgsrcDialog();
-            //                   });
-            //             },
-            //             icon: Icon(
-            //               Icons.add_circle,
-            //               size: 70,
-            //               color: Colors.white,
-            //             ),
-            //           ),
-            //           Text('hello')
-            //         ],
-            //       ),
+      child: Center(
+        child: Column(
+          children: [
+            // Padding(
+            //   padding: EdgeInsets.only(top: 8, left: lrPadding),
+            //   child: Text(
+            //     'Your',
+            //     style: TextStyle(
+            //       fontSize: 40,
+            //       fontWeight: FontWeight.bold,
+            //       color: Color.fromRGBO(58, 66, 86, 1.0),
             //     ),
             //   ),
             // ),
-          ),
-          Padding(
-            padding: EdgeInsets.only(bottom: 20),
-            child: FloatingActionButton.extended(
-              elevation: 15,
-              backgroundColor: Color.fromRGBO(70, 80, 100, 1.0),
-              onPressed: () {},
-              label: Row(
-                children: [
-                  IconButton(
-                      icon: FaIcon(FontAwesomeIcons.camera),
-                      onPressed: () {
-                        print('camera');
-                        _getImage(ImageSource.camera);
-                      }),
-                  Container(
-                    color: Colors.white,
-                    height: MediaQuery.of(context).size.height * 0.04,
-                    width: 2,
-                  ),
-                  IconButton(
-                      icon: FaIcon(FontAwesomeIcons.upload),
-                      onPressed: () {
-                        print('gallery');
-                        _getImage(ImageSource.gallery);
-                      }),
-                ],
+            // Padding(
+            //   padding: EdgeInsets.only(left: lrPadding),
+            //   child: Text(
+            //     'Documents',
+            //     style: TextStyle(
+            //       fontSize: 40,
+            //       fontWeight: FontWeight.bold,
+            //       color: Color.fromRGBO(58, 66, 86, 1.0),
+            //     ),
+            //   ),
+            // ),
+            Expanded(
+              flex: 1,
+              child: file.length != 0
+                  ? ListView.builder(
+                      itemCount: file.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        var name = file[index].toString().split("/");
+                        String fName =
+                            name[name.length - 1].replaceAll("'", "");
+                        print(fName);
+                        return Card(
+                          color: Color.fromRGBO(58, 66, 86, 1.0),
+                          // color: Colors.blue,
+                          child: ExpansionTile(
+                            childrenPadding: EdgeInsets.only(
+                                left: 30, bottom: 10, right: 30),
+                            title: Text(
+                              fName,
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 21),
+                            ),
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: RaisedButton(
+                                      onPressed: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    PDFshow(file[index])));
+                                      },
+                                      child: Text(
+                                        'Open',
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                      color: Color.fromRGBO(38, 46, 66, 1.0),
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(30)),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: RaisedButton(
+                                      onPressed: () async {
+                                        Uint8List pfile =
+                                            await file[index].readAsBytes();
+                                        await Share.file('Pdf Document', fName,
+                                            pfile, '*/*');
+                                      },
+                                      child: Text(
+                                        'Share',
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                      color: Color.fromRGBO(38, 46, 66, 1.0),
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(30)),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: RaisedButton(
+                                      onPressed: () async {
+                                        print('delete');
+                                        showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return DeleteDialog(
+                                                  file[index], this);
+                                            });
+                                      },
+                                      child: Text(
+                                        'Delete',
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                      color: Color.fromRGBO(38, 46, 66, 1.0),
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(30)),
+                                    ),
+                                  ),
+                                ],
+                              )
+                            ],
+                          ),
+                        );
+                      })
+                  : Padding(
+                      padding: EdgeInsets.only(
+                          top: MediaQuery.of(context).size.height * 0.35),
+                      child: Text(
+                        'No files',
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Color.fromRGBO(58, 66, 86, 1.0),
+                        ),
+                      ),
+                    ),
+              // child: Padding(
+              //   padding: EdgeInsets.only(
+              //       left: lrPadding,
+              //       right: lrPadding,
+              //       bottom: MediaQuery.of(context).size.height * 0.4,
+              //       top: MediaQuery.of(context).size.height * 0.05),
+              //   child: Container(
+              //     width: MediaQuery.of(context).size.width,
+              //     child: Card(
+              //       shape: RoundedRectangleBorder(
+              //           borderRadius: BorderRadius.circular(30)),
+              //       color: Colors.blue,
+              //       child: Column(
+              //         // mainAxisAlignment: MainAxisAlignment.center,
+              //         children: [
+              //           IconButton(
+              //             onPressed: () {
+              //               showDialog(
+              //                   context: context,
+              //                   builder: (BuildContext context) {
+              //                     return ImgsrcDialog();
+              //                   });
+              //             },
+              //             icon: Icon(
+              //               Icons.add_circle,
+              //               size: 70,
+              //               color: Colors.white,
+              //             ),
+              //           ),
+              //           Text('hello')
+              //         ],
+              //       ),
+              //     ),
+              //   ),
+              // ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(bottom: 20, top: 5),
+              child: FloatingActionButton.extended(
+                elevation: 15,
+                backgroundColor: Color.fromRGBO(70, 80, 100, 1.0),
+                onPressed: () {},
+                label: Row(
+                  // mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                        icon: FaIcon(FontAwesomeIcons.camera),
+                        onPressed: () {
+                          print('camera');
+                          _getImage(ImageSource.camera);
+                        }),
+                    Container(
+                      color: Colors.white,
+                      height: MediaQuery.of(context).size.height * 0.04,
+                      width: 2,
+                    ),
+                    IconButton(
+                        icon: FaIcon(FontAwesomeIcons.upload),
+                        onPressed: () {
+                          print('gallery');
+                          _getImage(ImageSource.gallery);
+                        }),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
