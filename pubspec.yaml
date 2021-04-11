@@ -49,6 +49,7 @@ dependencies:
   flutter_spinkit:
   extended_navbar_scaffold:
   modal_bottom_sheet:
+  ff_navigation_bar:
 
 
 dev_dependencies:

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io' as io;
+import 'package:ff_navigation_bar/ff_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -35,9 +36,11 @@ class ShowImage extends StatefulWidget {
 
 PdfDocument pdf = new PdfDocument();
 List<dynamic> allimg = [];
+List<dynamic> allRotate = [];
 
 class _ShowImageState extends State<ShowImage> {
   var _currentIndex = 0;
+
   MethodChannel channel = new MethodChannel('opencv');
   GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   int index = 0;
@@ -118,18 +121,18 @@ class _ShowImageState extends State<ShowImage> {
       child: Scaffold(
         bottomNavigationBar: bottomNavBar(),
         appBar: AppBar(
-          leading: IconButton(
-            icon: Icon(
-              LineIcons.arrowLeft,
-              size: 30,
-              color: Colors.black,
-            ),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
+          // leading: IconButton(
+          //   icon: Icon(
+          //     LineIcons.arrowLeft,
+          //     size: 30,
+          //     color: Colors.black,
+          //   ),
+          //   onPressed: () {
+          //     Navigator.pop(context);
+          //   },
+          // ),
+          leadingWidth: 0,
           backgroundColor: Colors.white,
-          centerTitle: false,
           title: Text(
             'Edit',
             style: TextStyle(color: Colors.black),
@@ -137,108 +140,83 @@ class _ShowImageState extends State<ShowImage> {
           actions: [
             // IconButton(
             //     icon: Icon(
-            //       LineIcons.plus,
+            //       LineIcons.arrowRight,
             //       color: Colors.black,
             //       size: 30,
             //     ),
             //     onPressed: () async {
             //       if (!Sadded) {
-            //         setState(() {
-            //           loading = true;
-            //           // print('adding');
-            //         });
-            //         allimg.add(bytes);
+            //         // print('adding');
             //         PdfPage page = pdf.pages.add();
             //         page.graphics.drawImage(
             //             PdfBitmap(bytes),
             //             Rect.fromLTWH(0, 0, page.getClientSize().width,
             //                 page.getClientSize().height));
-            //         SharedPreferences pref =
-            //             await SharedPreferences.getInstance();
-            //         pref.setBool('check', true); // ongoing
+            //         allimg.add(bytes);
             //         setState(() {
-            //           loading = false;
-            //           // print('added');
             //           Sadded = true;
             //         });
             //       }
-            //       // _getImage(ImageSource.camera);
-            //       showDialog(
-            //           context: context,
-            //           builder: (BuildContext context) {
-            //             return ImgsrcDialog();
-            //           });
+            //       io.Directory dc = await getTemporaryDirectory();
+            //       String documentPath = dc.path;
+            //       io.File file = io.File("$documentPath/record1.pdf");
+            //       file.writeAsBytes(pdf.save());
+            //       String fullPath = "$documentPath/record1.pdf";
+            //       // print(fullPath);
+            //       Navigator.push(
+            //           context,
+            //           MaterialPageRoute(
+            //               builder: (context) => PDFView(
+            //                   fullPath,
+            //                   pdf,
+            //                   allimg,
+            //                   MediaQuery.of(context).size.height * 0.7,
+            //                   MediaQuery.of(context).size.width * 0.7)));
+            //       // print('displayed');
             //     }),
             IconButton(
-                icon: Icon(
-                  LineIcons.arrowRight,
-                  color: Colors.black,
-                  size: 30,
-                ),
-                onPressed: () async {
-                  if (!Sadded) {
-                    // print('adding');
-                    PdfPage page = pdf.pages.add();
-                    page.graphics.drawImage(
-                        PdfBitmap(bytes),
-                        Rect.fromLTWH(0, 0, page.getClientSize().width,
-                            page.getClientSize().height));
-                    allimg.add(bytes);
-                    setState(() {
-                      Sadded = true;
-                    });
-                  }
-                  io.Directory dc = await getTemporaryDirectory();
-                  String documentPath = dc.path;
-                  io.File file = io.File("$documentPath/record1.pdf");
-                  file.writeAsBytes(pdf.save());
-                  String fullPath = "$documentPath/record1.pdf";
-                  // print(fullPath);
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => PDFView(
-                              fullPath,
-                              pdf,
-                              allimg,
-                              MediaQuery.of(context).size.height * 0.7,
-                              MediaQuery.of(context).size.width * 0.7)));
-                  // print('displayed');
-                }),
+              icon: Icon(
+                Icons.close,
+                size: 30,
+                color: Colors.black,
+              ),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
           ],
         ),
         key: scaffoldKey,
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
-          elevation: 15,
-          child: Icon(
-            Icons.rotate_right,
-            size: 30,
-          ),
-          onPressed: () {
-            setState(() {
-              isRotating = true;
-            });
-            var nBytes;
-            Timer(Duration(seconds: 1), () async {
-              bytes = await channel
-                  .invokeMethod('rotate', {"bytes": bytes}).then((value) {
-                Timer(Duration(seconds: 3), () async {
-                  if (angle == 360) {
-                    angle = 0;
-                  }
-                  angle = angle + 90;
-                  var nbytes = await channel
-                      .invokeMethod('rotateCompleted', {"bytes": bytes});
-                  setState(() {
-                    bytes = nbytes;
-                    isRotating = false;
-                  });
-                });
-              });
-            });
-          },
-        ),
+        // floatingActionButton: FloatingActionButton(
+        //   backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
+        //   elevation: 15,
+        //   child: Icon(
+        //     Icons.rotate_right,
+        //     size: 30,
+        //   ),
+        //   onPressed: () {
+        //     setState(() {
+        //       isRotating = true;
+        //     });
+        //     Timer(Duration(seconds: 1), () async {
+        //       bytes = await channel
+        //           .invokeMethod('rotate', {"bytes": bytes}).then((value) {
+        //         Timer(Duration(seconds: 3), () async {
+        //           if (angle == 360) {
+        //             angle = 0;
+        //           }
+        //           angle = angle + 90;
+        //           var nbytes = await channel
+        //               .invokeMethod('rotateCompleted', {"bytes": bytes});
+        //           setState(() {
+        //             bytes = nbytes;
+        //             isRotating = false;
+        //           });
+        //         });
+        //       });
+        //     });
+        //   },
+        // ),
         backgroundColor: Colors.grey[300],
         body: Container(
           // color: Color.fromRGBO(58, 66, 86, 1.0),
@@ -374,75 +352,103 @@ class _ShowImageState extends State<ShowImage> {
     }
   }
 
-  BottomNavigationBar bottomNavBar() {
-    return BottomNavigationBar(
-      elevation: 0,
-      selectedFontSize: 14,
-      unselectedFontSize: 14,
-      selectedItemColor: Colors.black,
-      currentIndex: _currentIndex,
-      onTap: (index) async {
+  // BottomNavigationBar bottomNavBar() {
+  //   return BottomNavigationBar(
+  //     backgroundColor: Colors.white,
+  //     elevation: 0,
+  //     selectedFontSize: 14,
+  //     unselectedFontSize: 14,
+  //     selectedItemColor: Colors.black,
+  //     currentIndex: _currentIndex,
+  //     onTap: (index) async {
+  //       setState(() {
+  //         _currentIndex = index;
+  //       });
+  //       if (_currentIndex == 0) {
+  //         colorOptions();
+  //       } else if (_currentIndex == 2) {
+  //         addPage();
+  //       } else if (_currentIndex == 1) {
+  //         navigateToAdjustImage();
+  //       }
+  //     },
+  //     items: [
+  //       BottomNavigationBarItem(
+  //           icon: Icon(Icons.color_lens_outlined),
+  //           label: 'Color',
+  //           activeIcon: Icon(
+  //             Icons.format_paint_outlined,
+  //             size: 30,
+  //             color: Colors.red,
+  //           )),
+  //       BottomNavigationBarItem(
+  //           icon: Icon(Icons.crop),
+  //           label: 'Crop',
+  //           activeIcon: Icon(
+  //             Icons.crop,
+  //             size: 30,
+  //             color: Colors.blue,
+  //           )),
+  //       BottomNavigationBarItem(
+  //         icon: Icon(
+  //           LineIcons.plus,
+  //           color: Colors.black,
+  //           size: 30,
+  //         ),
+  //         activeIcon: Icon(
+  //           LineIcons.plus,
+  //           size: 30,
+  //           color: Colors.green,
+  //         ),
+  //         label: 'Add page',
+  //       ),
+  //     ],
+  //   );
+  // }
+  FFNavigationBar bottomNavBar() {
+    return FFNavigationBar(
+      theme: FFNavigationBarTheme(
+        barBackgroundColor: Colors.white,
+        selectedItemBackgroundColor: Colors.blue,
+        selectedItemIconColor: Colors.white,
+        selectedItemLabelColor: Colors.black,
+      ),
+      selectedIndex: _currentIndex,
+      onSelectTab: (index) {
         setState(() {
           _currentIndex = index;
         });
-        if (_currentIndex == 0) {
+        if (_currentIndex == 2) {
           colorOptions();
-        } else if (_currentIndex == 2) {
-          if (!Sadded) {
-            setState(() {
-              loading = true;
-            });
-            allimg.add(bytes);
-            PdfPage page = pdf.pages.add();
-            page.graphics.drawImage(
-                PdfBitmap(bytes),
-                Rect.fromLTWH(0, 0, page.getClientSize().width,
-                    page.getClientSize().height));
-            SharedPreferences pref = await SharedPreferences.getInstance();
-            pref.setBool('check', true); // ongoing
-            setState(() {
-              loading = false;
-              Sadded = true;
-            });
-          }
-          // _getImage(ImageSource.camera);
-          showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return ImgsrcDialog();
-              });
+        } else if (_currentIndex == 0) {
+          addPage();
+        } else if (_currentIndex == 1) {
+          navigateToAdjustImage();
+        } else if (_currentIndex == 3) {
+          NaviagteToReorder();
         }
       },
       items: [
-        BottomNavigationBarItem(
-            icon: Icon(Icons.color_lens_outlined),
-            label: 'Color',
-            activeIcon: Icon(
-              Icons.format_paint_outlined,
-              size: 30,
-              color: Colors.red,
-            )),
-        BottomNavigationBarItem(
-            icon: Icon(Icons.crop),
-            label: 'Crop',
-            activeIcon: Icon(
-              Icons.crop,
-              size: 30,
-              color: Colors.blue,
-            )),
-        BottomNavigationBarItem(
-          icon: Icon(
-            LineIcons.plus,
-            color: Colors.black,
-            size: 30,
-          ),
-          activeIcon: Icon(
-            LineIcons.plus,
-            size: 30,
-            color: Colors.green,
-          ),
-          label: 'Add page',
-        )
+        FFNavigationBarItem(
+          iconData: Icons.add_circle,
+          label: 'Add Page',
+        ),
+        FFNavigationBarItem(
+          iconData: Icons.crop,
+          label: 'Crop',
+        ),
+        FFNavigationBarItem(
+          iconData: Icons.format_paint_outlined,
+          label: 'Colors',
+        ),
+        FFNavigationBarItem(
+          iconData: Icons.reorder,
+          label: 'Reorder',
+        ),
+        FFNavigationBarItem(
+          iconData: Icons.rotate_right,
+          label: 'Rotate',
+        ),
       ],
     );
   }
@@ -498,5 +504,92 @@ class _ShowImageState extends State<ShowImage> {
       width: 130,
       child: Image.memory(images[index]),
     );
+  }
+
+  void addPage() async {
+    if (!Sadded) {
+      setState(() {
+        loading = true;
+      });
+      allimg.add(bytes);
+      PdfPage page = pdf.pages.add();
+      page.graphics.drawImage(
+          PdfBitmap(bytes),
+          Rect.fromLTWH(
+              0, 0, page.getClientSize().width, page.getClientSize().height));
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      pref.setBool('check', true); // ongoing
+      setState(() {
+        loading = false;
+        Sadded = true;
+      });
+    }
+    // _getImage(ImageSource.camera);
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return ImgsrcDialog();
+        });
+  }
+
+  void navigateToAdjustImage() {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => AdjustImage(widget.file, context)));
+  }
+
+  void callRotate() {
+    for (int i = 0; i < 3; i++) {
+      setState(() {
+        allRotate[i] = rotate();
+      });
+    }
+  }
+
+  dynamic rotate() {
+    var nbytes;
+    Timer(Duration(seconds: 1), () async {
+      bytes =
+          await channel.invokeMethod('rotate', {"bytes": bytes}).then((value) {
+        Timer(Duration(seconds: 3), () async {
+          if (angle == 360) {
+            angle = 0;
+          }
+          angle = angle + 90;
+          nbytes =
+              await channel.invokeMethod('rotateCompleted', {"bytes": bytes});
+        });
+      });
+    });
+    return nbytes;
+  }
+
+  void NaviagteToReorder() async {
+    if (!Sadded) {
+      PdfPage page = pdf.pages.add();
+      page.graphics.drawImage(
+          PdfBitmap(bytes),
+          Rect.fromLTWH(
+              0, 0, page.getClientSize().width, page.getClientSize().height));
+      allimg.add(bytes);
+      setState(() {
+        Sadded = true;
+      });
+    }
+    io.Directory dc = await getTemporaryDirectory();
+    String documentPath = dc.path;
+    io.File file = io.File("$documentPath/record1.pdf");
+    file.writeAsBytes(pdf.save());
+    String fullPath = "$documentPath/record1.pdf";
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => PDFView(
+                fullPath,
+                pdf,
+                allimg,
+                MediaQuery.of(context).size.height * 0.7,
+                MediaQuery.of(context).size.width * 0.7)));
   }
 }

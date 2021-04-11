@@ -123,24 +123,9 @@ class _PDFViewState extends State<PDFView> {
           ],
         ),
         body: Container(
-          // color: Color.fromRGBO(58, 66, 86, 1.0),
           color: Colors.grey[300],
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
-          // child: p.PDFView(
-          //   filePath: path,
-          // ),
-          // child: ListView.builder(
-          //     itemCount: widget.images.length,
-          //     scrollDirection: Axis.horizontal,
-          //     itemBuilder: (BuildContext context, int index) {
-          //       return Container(
-          //         constraints: BoxConstraints(
-          //             maxWidth: MediaQuery.of(context).size.width * 0.9,
-          //             maxHeight: MediaQuery.of(context).size.height * 0.7),
-          //         child: Image.memory(widget.images[index]),
-          //       );
-          //     }),
           child: Column(
             children: [
               CarouselSlider(
@@ -182,21 +167,6 @@ class _PDFViewState extends State<PDFView> {
                   ),
                 ),
               ),
-              // Container(
-              //   height: MediaQuery.of(context).size.height * 0.1,
-              //   child: RaisedButton(
-              //     color: Color.fromRGBO(40, 50, 70, 1.0),
-              //     shape: RoundedRectangleBorder(
-              //         borderRadius: BorderRadius.circular(100)),
-              //     onPressed: () {
-              //
-              //     },
-              //     child: Icon(
-              //       Icons.delete,
-              //       color: Colors.white,
-              //     ),
-              //   ),
-              // )
             ],
           ),
         ));

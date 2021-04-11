@@ -81,6 +81,10 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   AnimationController _controller;
   @override
   Widget build(BuildContext context) {
+    DateTime getdate(io.File file) {
+      return file.lastModifiedSync();
+    }
+
     var leftPadding = MediaQuery.of(context).size.width * 0.03;
     var topPadding = MediaQuery.of(context).size.height * 0.01;
     return Container(
@@ -142,6 +146,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                   var name = file[index].toString().split("/");
                                   String fName =
                                       name[name.length - 1].replaceAll("'", "");
+                                  DateTime lastmodified = getdate(file[index]);
                                   return Container(
                                     width: MediaQuery.of(context).size.width,
                                     height: MediaQuery.of(context).size.height *
@@ -187,7 +192,14 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                                                 'Ubuntu'),
                                                       ),
                                                       Text(
-                                                        '07/03/2021',
+                                                        lastmodified.day
+                                                                .toString() +
+                                                            '/' +
+                                                            lastmodified.month
+                                                                .toString() +
+                                                            '/' +
+                                                            lastmodified.year
+                                                                .toString(),
                                                         style: TextStyle(
                                                             color: Colors.black,
                                                             fontSize: 15,
@@ -275,19 +287,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                               ),
                             )
                           : Center(
-                              child: Container(
-                                  // height: 300,
-                                  // width: 300,
-                                  // child: Lottie.asset(
-                                  //   "asset/animation/menu.json",
-                                  //   // controller: _controller,
-                                  //   // onLoaded: (composition) {
-                                  //   //   _controller
-                                  //   //     ..duration = composition.duration
-                                  //   //     ..forward();
-                                  //   // },
-                                  // ),
-                                  ),
+                              child: Container(),
                             )),
                   Padding(
                     padding: EdgeInsets.only(top: 10),
