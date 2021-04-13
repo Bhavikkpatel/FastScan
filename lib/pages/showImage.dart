@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:line_icons/line_icons.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:scanner/pages/image_adjust.dart';
+import 'package:scanner/pages/rearrange.dart';
 import 'package:scanner/widgets/ImgSourceDialog.dart';
 import 'package:scanner/widgets/pdfpreview.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -36,10 +36,26 @@ class ShowImage extends StatefulWidget {
 
 PdfDocument pdf = new PdfDocument();
 List<dynamic> allimg = [];
-List<dynamic> allRotate = [];
 
 class _ShowImageState extends State<ShowImage> {
-  var _currentIndex = 0;
+  var _currentIndex = 2;
+  var pageindex;
+  var allImages = <Widget>[];
+  List<dynamic> allRotate = [];
+  void add() {
+    Timer(Duration(seconds: 2), () {
+      for (int i = 0; i < allimg.length; i++) {
+        Widget container = Container(
+          height: widget.height,
+          width: widget.width,
+          child: Image.memory(allimg[i]),
+        );
+        setState(() {
+          allImages.add(container);
+        });
+      }
+    });
+  }
 
   MethodChannel channel = new MethodChannel('opencv');
   GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
@@ -67,7 +83,6 @@ class _ShowImageState extends State<ShowImage> {
   void check() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     if (pref.getBool('check') == false) {
-      // print('pref.getBool() = ${pref.getBool('check')}');
       pdf = new PdfDocument();
       allimg = [];
     }
@@ -90,6 +105,9 @@ class _ShowImageState extends State<ShowImage> {
     br_y = (widget.imagePixelSize.height / widget.height) * widget.br.dy;
     convertToGray();
     filter();
+    setState(() {
+      pageindex = allimg.length;
+    });
   }
 
   @override
@@ -121,109 +139,38 @@ class _ShowImageState extends State<ShowImage> {
       child: Scaffold(
         bottomNavigationBar: bottomNavBar(),
         appBar: AppBar(
-          // leading: IconButton(
-          //   icon: Icon(
-          //     LineIcons.arrowLeft,
-          //     size: 30,
-          //     color: Colors.black,
-          //   ),
-          //   onPressed: () {
-          //     Navigator.pop(context);
-          //   },
-          // ),
-          leadingWidth: 0,
+          leadingWidth: MediaQuery.of(context).size.width * 0.1,
           backgroundColor: Colors.white,
           title: Text(
             'Edit',
             style: TextStyle(color: Colors.black),
           ),
-          actions: [
-            // IconButton(
-            //     icon: Icon(
-            //       LineIcons.arrowRight,
-            //       color: Colors.black,
-            //       size: 30,
-            //     ),
-            //     onPressed: () async {
-            //       if (!Sadded) {
-            //         // print('adding');
-            //         PdfPage page = pdf.pages.add();
-            //         page.graphics.drawImage(
-            //             PdfBitmap(bytes),
-            //             Rect.fromLTWH(0, 0, page.getClientSize().width,
-            //                 page.getClientSize().height));
-            //         allimg.add(bytes);
-            //         setState(() {
-            //           Sadded = true;
-            //         });
-            //       }
-            //       io.Directory dc = await getTemporaryDirectory();
-            //       String documentPath = dc.path;
-            //       io.File file = io.File("$documentPath/record1.pdf");
-            //       file.writeAsBytes(pdf.save());
-            //       String fullPath = "$documentPath/record1.pdf";
-            //       // print(fullPath);
-            //       Navigator.push(
-            //           context,
-            //           MaterialPageRoute(
-            //               builder: (context) => PDFView(
-            //                   fullPath,
-            //                   pdf,
-            //                   allimg,
-            //                   MediaQuery.of(context).size.height * 0.7,
-            //                   MediaQuery.of(context).size.width * 0.7)));
-            //       // print('displayed');
-            //     }),
-            IconButton(
-              icon: Icon(
-                Icons.close,
-                size: 30,
-                color: Colors.black,
-              ),
-              onPressed: () {
-                Navigator.pop(context);
-              },
+          leading: IconButton(
+            icon: Icon(
+              Icons.close,
+              size: 30,
+              color: Colors.black,
             ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          actions: [
+            IconButton(
+                icon: Icon(
+                  Icons.save_alt_rounded,
+                  color: Colors.black,
+                ),
+                onPressed: NaviagteToPreview)
           ],
         ),
         key: scaffoldKey,
-        // floatingActionButton: FloatingActionButton(
-        //   backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
-        //   elevation: 15,
-        //   child: Icon(
-        //     Icons.rotate_right,
-        //     size: 30,
-        //   ),
-        //   onPressed: () {
-        //     setState(() {
-        //       isRotating = true;
-        //     });
-        //     Timer(Duration(seconds: 1), () async {
-        //       bytes = await channel
-        //           .invokeMethod('rotate', {"bytes": bytes}).then((value) {
-        //         Timer(Duration(seconds: 3), () async {
-        //           if (angle == 360) {
-        //             angle = 0;
-        //           }
-        //           angle = angle + 90;
-        //           var nbytes = await channel
-        //               .invokeMethod('rotateCompleted', {"bytes": bytes});
-        //           setState(() {
-        //             bytes = nbytes;
-        //             isRotating = false;
-        //           });
-        //         });
-        //       });
-        //     });
-        //   },
-        // ),
         backgroundColor: Colors.grey[300],
         body: Container(
-          // color: Color.fromRGBO(58, 66, 86, 1.0),
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
           child: Center(
-            child: loading || isRotating
+            child: (loading || isRotating)
                 ? SpinKitDoubleBounce(
                     color: Colors.blue,
                   )
@@ -252,9 +199,8 @@ class _ShowImageState extends State<ShowImage> {
                             ],
                           )
                         : Center(
-                            child: SpinKitPouringHourglass(
+                            child: SpinKitDoubleBounce(
                             color: Colors.blue,
-                            size: 100,
                           )),
                   ),
           ),
@@ -319,7 +265,6 @@ class _ShowImageState extends State<ShowImage> {
       });
     });
     Timer(Duration(seconds: 7), () async {
-      // print("this started");
       await channel.invokeMethod('grayCompleted').then((value) {
         grayBytes = value;
         isGrayBytes = true;
@@ -338,7 +283,6 @@ class _ShowImageState extends State<ShowImage> {
       setState(() {
         loading = false;
       });
-      // print('loading:  $loading');
     });
   }
 
@@ -347,64 +291,10 @@ class _ShowImageState extends State<ShowImage> {
       setState(() {
         loading = true;
       });
-      // print('loading:  $loading');
       grayandoriginal();
     }
   }
 
-  // BottomNavigationBar bottomNavBar() {
-  //   return BottomNavigationBar(
-  //     backgroundColor: Colors.white,
-  //     elevation: 0,
-  //     selectedFontSize: 14,
-  //     unselectedFontSize: 14,
-  //     selectedItemColor: Colors.black,
-  //     currentIndex: _currentIndex,
-  //     onTap: (index) async {
-  //       setState(() {
-  //         _currentIndex = index;
-  //       });
-  //       if (_currentIndex == 0) {
-  //         colorOptions();
-  //       } else if (_currentIndex == 2) {
-  //         addPage();
-  //       } else if (_currentIndex == 1) {
-  //         navigateToAdjustImage();
-  //       }
-  //     },
-  //     items: [
-  //       BottomNavigationBarItem(
-  //           icon: Icon(Icons.color_lens_outlined),
-  //           label: 'Color',
-  //           activeIcon: Icon(
-  //             Icons.format_paint_outlined,
-  //             size: 30,
-  //             color: Colors.red,
-  //           )),
-  //       BottomNavigationBarItem(
-  //           icon: Icon(Icons.crop),
-  //           label: 'Crop',
-  //           activeIcon: Icon(
-  //             Icons.crop,
-  //             size: 30,
-  //             color: Colors.blue,
-  //           )),
-  //       BottomNavigationBarItem(
-  //         icon: Icon(
-  //           LineIcons.plus,
-  //           color: Colors.black,
-  //           size: 30,
-  //         ),
-  //         activeIcon: Icon(
-  //           LineIcons.plus,
-  //           size: 30,
-  //           color: Colors.green,
-  //         ),
-  //         label: 'Add page',
-  //       ),
-  //     ],
-  //   );
-  // }
   FFNavigationBar bottomNavBar() {
     return FFNavigationBar(
       theme: FFNavigationBarTheme(
@@ -421,11 +311,32 @@ class _ShowImageState extends State<ShowImage> {
         if (_currentIndex == 2) {
           colorOptions();
         } else if (_currentIndex == 0) {
-          addPage();
+          addOption();
         } else if (_currentIndex == 1) {
           navigateToAdjustImage();
         } else if (_currentIndex == 3) {
           NaviagteToReorder();
+        } else if (_currentIndex == 4) {
+          setState(() {
+            isRotating = true;
+          });
+          Timer(Duration(seconds: 1), () async {
+            bytes = await channel
+                .invokeMethod('rotate', {"bytes": bytes}).then((value) {
+              Timer(Duration(seconds: 3), () async {
+                if (angle == 360) {
+                  angle = 0;
+                }
+                angle = angle + 90;
+                var nbytes = await channel
+                    .invokeMethod('rotateCompleted', {"bytes": bytes});
+                setState(() {
+                  bytes = nbytes;
+                  isRotating = false;
+                });
+              });
+            });
+          });
         }
       },
       items: [
@@ -506,6 +417,68 @@ class _ShowImageState extends State<ShowImage> {
     );
   }
 
+  void rotateOptions() {
+    print(allRotate.length);
+    showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return ConstrainedBox(
+            constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.3),
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: [
+                GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        bytes = allRotate[0];
+                      });
+                      Navigator.pop(context);
+                    },
+                    child: RotateContainer(0)),
+                SizedBox(
+                  width: 10,
+                ),
+                GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        bytes = allRotate[1];
+                      });
+                      Navigator.pop(context);
+                    },
+                    child: RotateContainer(1)),
+                SizedBox(
+                  width: 10,
+                ),
+                GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        bytes = allRotate[2];
+                      });
+                      Navigator.pop(context);
+                    },
+                    child: RotateContainer(2)),
+                GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        bytes = allRotate[3];
+                      });
+                      Navigator.pop(context);
+                    },
+                    child: RotateContainer(3)),
+              ],
+            ),
+          );
+        });
+  }
+
+  Widget RotateContainer(index) {
+    return Container(
+      width: 130,
+      child: Image.memory(allRotate[index]),
+    );
+  }
+
   void addPage() async {
     if (!Sadded) {
       setState(() {
@@ -539,18 +512,10 @@ class _ShowImageState extends State<ShowImage> {
             builder: (context) => AdjustImage(widget.file, context)));
   }
 
-  void callRotate() {
-    for (int i = 0; i < 3; i++) {
-      setState(() {
-        allRotate[i] = rotate();
-      });
-    }
-  }
-
-  dynamic rotate() {
-    var nbytes;
+  dynamic rotate() async {
+    var nbytes, abytes;
     Timer(Duration(seconds: 1), () async {
-      bytes =
+      abytes =
           await channel.invokeMethod('rotate', {"bytes": bytes}).then((value) {
         Timer(Duration(seconds: 3), () async {
           if (angle == 360) {
@@ -566,6 +531,22 @@ class _ShowImageState extends State<ShowImage> {
   }
 
   void NaviagteToReorder() async {
+    if (Sadded == false) {
+      setState(() {
+        allimg.add(bytes);
+        Sadded = true;
+      });
+    }
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (contect) => Rearrange(
+                allimg,
+                MediaQuery.of(context).size.height * 0.3,
+                MediaQuery.of(context).size.width * 0.3)));
+  }
+
+  void NaviagteToPreview() async {
     if (!Sadded) {
       PdfPage page = pdf.pages.add();
       page.graphics.drawImage(
@@ -591,5 +572,57 @@ class _ShowImageState extends State<ShowImage> {
                 allimg,
                 MediaQuery.of(context).size.height * 0.7,
                 MediaQuery.of(context).size.width * 0.7)));
+  }
+
+  void addOption() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.setBool('check', true);
+    setState(() {
+      allimg.add(bytes);
+      Sadded = true;
+    });
+    showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return ConstrainedBox(
+            constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.2),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    _getImage(ImageSource.camera);
+                  },
+                  child: ListTile(
+                    leading: Icon(
+                      Icons.camera,
+                      color: Colors.blue,
+                    ),
+                    title: Text(
+                      'Camera',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    _getImage(ImageSource.gallery);
+                  },
+                  child: ListTile(
+                    leading: Icon(
+                      Icons.image,
+                      color: Colors.red,
+                    ),
+                    title: Text(
+                      'Gallery',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
   }
 }

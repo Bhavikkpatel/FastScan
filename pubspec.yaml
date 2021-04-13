@@ -50,6 +50,9 @@ dependencies:
   extended_navbar_scaffold:
   modal_bottom_sheet:
   ff_navigation_bar:
+  flutter_file_manager:
+  path:
+  path_provider_ex:
 
 
 dev_dependencies:

@@ -4,11 +4,13 @@ import 'dart:typed_data';
 import 'package:esys_flutter_share/esys_flutter_share.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_file_manager/flutter_file_manager.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:lottie/lottie.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:path_provider_ex/path_provider_ex.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:scanner/pages/image_adjust.dart';
 import 'package:scanner/widgets/contants.dart';
 import 'package:scanner/widgets/showpdf.dart';
@@ -22,6 +24,15 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> with TickerProviderStateMixin {
+  _requestPermission() async {
+    Map<Permission, PermissionStatus> statuses = await [
+      Permission.storage,
+    ].request();
+
+    final info = statuses[Permission.storage].toString();
+    print('permission   $info');
+  }
+
   GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey();
   io.File _image;
   bool loading = true;
@@ -39,6 +50,27 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     } catch (e) {
       print('Error occurred -> $e');
     }
+  }
+
+  // get all pdfs from system
+  List<io.File> files;
+
+  void getFiles() async {
+    //async function to get list of files
+    List<StorageInfo> storageInfo = await PathProviderEx.getStorageInfo();
+    var Currdirectory = (await getApplicationDocumentsDirectory()).path;
+    String currPath = "$Currdirectory/scan/";
+    var root = storageInfo[0]
+        .rootDir; //storageInfo[1] for SD card, geting the root directory
+    var fm = FileManager(root: Directory(root)); //
+    files = await fm.filesTree(
+        excludedPaths: [currPath],
+        extensions: ["pdf"] //optional, to filter files, list only pdf files
+        );
+    setState(() {
+      print(files);
+    });
+    getSystemPdfImages();
   }
 
   List file = new List();
@@ -64,10 +96,35 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     });
   }
 
+  List<dynamic> sysimgs = [];
+  void getSystemPdfImages() async {
+    try {
+      // directory = (await getApplicationDocumentsDirectory()).path;
+      // setState(() {
+      //   file = io.Directory("$directory/scan/").listSync();
+      // });
+      for (int i = 0; i < files.length; i++) {
+        final doc = await nativePdf.PdfDocument.openFile(files[i].path);
+        final page = await doc.getPage(1);
+        final pageImage =
+            await page.render(width: page.width, height: page.height);
+        sysimgs.add(pageImage.bytes);
+      }
+    } catch (e) {
+      print(e);
+    }
+    setState(() {
+      loading = false;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    _requestPermission();
     get();
+    getFiles();
+
     _controller = AnimationController(vsync: this);
   }
 
@@ -148,7 +205,8 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                       name[name.length - 1].replaceAll("'", "");
                                   DateTime lastmodified = getdate(file[index]);
                                   return Container(
-                                    width: MediaQuery.of(context).size.width,
+                                    width:
+                                        MediaQuery.of(context).size.width - 100,
                                     height: MediaQuery.of(context).size.height *
                                         0.2,
                                     color: Color.fromRGBO(245, 245, 245, 1.0),
@@ -251,7 +309,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                                           MediaQuery.of(context)
                                                                   .size
                                                                   .width *
-                                                              0.15,
+                                                              0.1,
                                                     ),
                                                     IconButton(
                                                       icon: Icon(Icons
@@ -289,6 +347,171 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                           : Center(
                               child: Container(),
                             )),
+                  // Expanded(
+                  //     flex: 1,
+                  //     child: files.length != 0
+                  //         ? Container(
+                  //             color: Color.fromRGBO(232, 232, 232, 1.0),
+                  //             child: ListView.builder(
+                  //               itemCount: files.length,
+                  //               itemBuilder: (BuildContext context, int index) {
+                  //                 var name = files[index].toString().split("/");
+                  //                 String fName =
+                  //                     name[name.length - 1].replaceAll("'", "");
+                  //                 DateTime lastmodified = getdate(files[index]);
+                  //                 return Container(
+                  //                   width: MediaQuery.of(context).size.width,
+                  //                   height: MediaQuery.of(context).size.height *
+                  //                       0.2,
+                  //                   color: Color.fromRGBO(245, 245, 245, 1.0),
+                  //                   child: Row(
+                  //                     children: [
+                  //                       Card(
+                  //                         color: Color.fromRGBO(
+                  //                             248, 248, 248, 1.0),
+                  //                         child: Padding(
+                  //                           padding: EdgeInsets.symmetric(
+                  //                               horizontal: 10),
+                  //                           child: Image(
+                  //                             image:
+                  //                                 MemoryImage(sysimgs[index]),
+                  //                           ),
+                  //                         ),
+                  //                       ),
+                  //                       Row(
+                  //                         children: [
+                  //                           Column(
+                  //                             crossAxisAlignment:
+                  //                                 CrossAxisAlignment.start,
+                  //                             mainAxisAlignment:
+                  //                                 MainAxisAlignment
+                  //                                     .spaceBetween,
+                  //                             children: [
+                  //                               Padding(
+                  //                                 padding: EdgeInsets.only(
+                  //                                     left: leftPadding,
+                  //                                     top: topPadding),
+                  //                                 child: Column(
+                  //                                   crossAxisAlignment:
+                  //                                       CrossAxisAlignment
+                  //                                           .start,
+                  //                                   children: [
+                  //                                     Container(
+                  //                                       child: Expanded(
+                  //                                         child: Text(
+                  //                                           'fName',
+                  //                                           overflow:
+                  //                                               TextOverflow
+                  //                                                   .fade,
+                  //                                           maxLines: 1,
+                  //                                           softWrap: true,
+                  //                                           style: TextStyle(
+                  //                                               color: Colors
+                  //                                                   .black,
+                  //                                               fontSize: 20,
+                  //                                               fontFamily:
+                  //                                                   'Ubuntu'),
+                  //                                         ),
+                  //                                       ),
+                  //                                     ),
+                  //                                     Text(
+                  //                                       lastmodified.day
+                  //                                               .toString() +
+                  //                                           '/' +
+                  //                                           lastmodified.month
+                  //                                               .toString() +
+                  //                                           '/' +
+                  //                                           lastmodified.year
+                  //                                               .toString(),
+                  //                                       style: TextStyle(
+                  //                                           color: Colors.black,
+                  //                                           fontSize: 15,
+                  //                                           fontFamily:
+                  //                                               'Ubuntu'),
+                  //                                     )
+                  //                                   ],
+                  //                                 ),
+                  //                               ),
+                  //                               Row(
+                  //                                 mainAxisAlignment:
+                  //                                     MainAxisAlignment.start,
+                  //                                 children: [
+                  //                                   IconButton(
+                  //                                     icon: Icon(
+                  //                                         Icons.file_present),
+                  //                                     onPressed: () {
+                  //                                       Navigator.push(
+                  //                                           context,
+                  //                                           MaterialPageRoute(
+                  //                                               builder: (context) =>
+                  //                                                   PDFshow(files[
+                  //                                                       index])));
+                  //                                     },
+                  //                                   ),
+                  //                                   SizedBox(
+                  //                                     width:
+                  //                                         MediaQuery.of(context)
+                  //                                                 .size
+                  //                                                 .width *
+                  //                                             0.15,
+                  //                                   ),
+                  //                                   IconButton(
+                  //                                     icon: Icon(
+                  //                                         Icons.share_sharp),
+                  //                                     onPressed: () async {
+                  //                                       Uint8List pfile =
+                  //                                           await file[index]
+                  //                                               .readAsBytes();
+                  //                                       await Share.file(
+                  //                                           'Pdf Document',
+                  //                                           fName,
+                  //                                           pfile,
+                  //                                           '*/*');
+                  //                                     },
+                  //                                   ),
+                  //                                   SizedBox(
+                  //                                     width:
+                  //                                         MediaQuery.of(context)
+                  //                                                 .size
+                  //                                                 .width *
+                  //                                             0.1,
+                  //                                   ),
+                  //                                   IconButton(
+                  //                                     icon: Icon(Icons
+                  //                                         .delete_outline_sharp),
+                  //                                     onPressed: () async {
+                  //                                       // print('delete');
+                  //                                       showDialog(
+                  //                                           context: context,
+                  //                                           builder:
+                  //                                               (BuildContext
+                  //                                                   context) {
+                  //                                             return DeleteDialog(
+                  //                                                 files[index],
+                  //                                                 this);
+                  //                                           });
+                  //                                     },
+                  //                                   ),
+                  //                                 ],
+                  //                               )
+                  //                             ],
+                  //                           )
+                  //                         ],
+                  //                       ),
+                  //                       Divider(
+                  //                         // color: Color.fromRGBO(232, 232, 232, 1.0),
+                  //                         color: Colors.white,
+                  //                         thickness: 5,
+                  //                       ),
+                  //                     ],
+                  //                   ),
+                  //                 );
+                  //               },
+                  //             ),
+                  //           )
+                  //         : Center(
+                  //             child: Container(),
+                  //           )),
                   Padding(
                     padding: EdgeInsets.only(top: 10),
                     child: Row(

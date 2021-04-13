@@ -68,49 +68,24 @@ class _RearrangeState extends State<Rearrange> {
 
     return SafeArea(
       child: Scaffold(
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
-          child: Icon(Icons.save_outlined),
-        ),
         appBar: AppBar(
-          backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
-          title: Text('re-arrange'),
-          centerTitle: true,
-          actions: [
-            IconButton(
-                icon: Icon(
-                  LineIcons.save,
-                  size: 30,
-                ),
-                onPressed: () {
-                  PdfDocument pdf = PdfDocument();
-                  for (int i = 0; i < widget.image.length; i++) {
-                    // print(img[i]);
-                    PdfPage page = pdf.pages.add();
-                    page.graphics.drawImage(
-                        PdfBitmap(img[i]),
-                        Rect.fromLTWH(0, 0, page.getClientSize().width,
-                            page.getClientSize().height));
-                  }
-                  showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return CusDialog(pdf);
-                      });
-                }),
-            IconButton(
-                icon: Icon(
-                  LineIcons.windowClose,
-                  size: 30,
-                ),
-                onPressed: () {
-                  showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return DiscardDialog();
-                      });
-                })
-          ],
+          backgroundColor: Colors.white,
+          title: Text(
+            're-arrange',
+            style: TextStyle(color: Colors.black),
+          ),
+          leadingWidth: MediaQuery.of(context).size.width * 0.1,
+          leading: IconButton(
+            icon: Icon(
+              Icons.close,
+              size: 30,
+              color: Colors.black,
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          actions: [],
         ),
         body: Container(
           // color: Color.fromRGBO(58, 66, 86, 1.0),

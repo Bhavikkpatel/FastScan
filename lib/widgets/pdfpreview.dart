@@ -8,6 +8,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:scanner/pages/image_adjust.dart';
 import 'package:scanner/pages/rearrange.dart';
 import 'package:scanner/widgets/ImgSourceDialog.dart';
+import 'package:scanner/widgets/dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
@@ -90,35 +91,49 @@ class _PDFViewState extends State<PDFView> {
           title: Text('Preview'),
           centerTitle: true,
           actions: [
+            // IconButton(
+            //     icon: Icon(
+            //       LineIcons.plus,
+            //       size: 30,
+            //     ),
+            //     onPressed: () async {
+            //       SharedPreferences pref =
+            //           await SharedPreferences.getInstance();
+            //       pref.setBool('check', true);
+            //       // _getImage(ImageSource.camera);
+            //       showDialog(
+            //           context: context,
+            //           builder: (BuildContext context) {
+            //             return ImgsrcDialog();
+            //           });
+            //     }),
             IconButton(
                 icon: Icon(
-                  LineIcons.plus,
+                  Icons.save_alt_rounded,
                   size: 30,
                 ),
                 onPressed: () async {
-                  SharedPreferences pref =
-                      await SharedPreferences.getInstance();
-                  pref.setBool('check', true);
-                  // _getImage(ImageSource.camera);
+                  // Navigator.push(
+                  //     context,
+                  //     MaterialPageRoute(
+                  //         builder: (contect) => Rearrange(
+                  //             widget.images,
+                  //             MediaQuery.of(context).size.height * 0.3,
+                  //             MediaQuery.of(context).size.width * 0.3)));
+                  PdfDocument pdf = PdfDocument();
+                  for (int i = 0; i < widget.images.length; i++) {
+                    // print(img[i]);
+                    PdfPage page = pdf.pages.add();
+                    page.graphics.drawImage(
+                        PdfBitmap(imagesList[i]),
+                        Rect.fromLTWH(0, 0, page.getClientSize().width,
+                            page.getClientSize().height));
+                  }
                   showDialog(
                       context: context,
                       builder: (BuildContext context) {
-                        return ImgsrcDialog();
+                        return CusDialog(pdf);
                       });
-                }),
-            IconButton(
-                icon: Icon(
-                  LineIcons.save,
-                  size: 30,
-                ),
-                onPressed: () async {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (contect) => Rearrange(
-                              widget.images,
-                              MediaQuery.of(context).size.height * 0.3,
-                              MediaQuery.of(context).size.width * 0.3)));
                 }),
           ],
         ),
@@ -126,48 +141,49 @@ class _PDFViewState extends State<PDFView> {
           color: Colors.grey[300],
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
-          child: Column(
-            children: [
-              CarouselSlider(
-                options: CarouselOptions(
-                  // aspectRatio: 2.0,
-                  pauseAutoPlayOnManualNavigate: true,
-                  height: widget.height,
-                  enlargeCenterPage: true,
-                  enableInfiniteScroll: false,
-                  initialPage: 1,
-                  autoPlay: false,
-                  onPageChanged: (index, just) {
-                    print(index);
-                    setState(() {
-                      pageindex = index;
-                    });
-                  },
-                ),
-                items: images,
-              ),
-              ClipOval(
-                child: Material(
-                  color: Color.fromRGBO(30, 40, 60, 1.0), // button color
-                  child: InkWell(
-                    splashColor: Colors.red, // inkwell color
-                    child: SizedBox(
-                        width: 56,
-                        height: 56,
-                        child: Icon(
-                          Icons.delete,
-                          color: Colors.white,
-                        )),
-                    onTap: () {
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                CarouselSlider(
+                  options: CarouselOptions(
+                    pauseAutoPlayOnManualNavigate: true,
+                    height: widget.height,
+                    enlargeCenterPage: true,
+                    enableInfiniteScroll: false,
+                    initialPage: 1,
+                    autoPlay: false,
+                    onPageChanged: (index, just) {
+                      print(index);
                       setState(() {
-                        images.removeAt(pageindex);
-                        imagesList.removeAt(pageindex);
+                        pageindex = index;
                       });
                     },
                   ),
+                  items: images,
                 ),
-              ),
-            ],
+                ClipOval(
+                  child: Material(
+                    color: Color.fromRGBO(30, 40, 60, 1.0), // button color
+                    child: InkWell(
+                      splashColor: Colors.red, // inkwell color
+                      child: SizedBox(
+                          width: 56,
+                          height: 56,
+                          child: Icon(
+                            Icons.delete,
+                            color: Colors.white,
+                          )),
+                      onTap: () {
+                        setState(() {
+                          images.removeAt(pageindex);
+                          imagesList.removeAt(pageindex);
+                        });
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ));
   }

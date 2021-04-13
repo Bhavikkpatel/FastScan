@@ -32,19 +32,18 @@ class _ImgsrcDialogState extends State<ImgsrcDialog> {
   }
 
   var _imagePicker = ImagePicker();
-  io.File _image;
+
   String path;
   _getImage(ImageSource imageSource) async {
     try {
       PickedFile imageFile = await _imagePicker.getImage(source: imageSource);
       if (imageFile == null) return;
-      setState(() {
-        _image = io.File(imageFile.path);
-      });
-      Navigator.of(context).pushReplacement(MaterialPageRoute(
+      io.File _image;
+      _image = io.File(imageFile.path);
+      Navigator.of(context).push(MaterialPageRoute(
           builder: (context) => AdjustImage(_image, context)));
     } catch (e) {
-      // print('Error occurred -> $e');
+      print('Error occurred -> $e');
     }
   }
 
